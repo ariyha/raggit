@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RagGit</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #1a1a1a;
+            --secondary-bg: #242424;
+            --border-color: #383838;
+            --primary-text: #f3f4f6;
+            --secondary-text: #9ca3af;
+            --accent-color: #7b61ff;
+            --accent-light: #9580ff;
+            --user-bubble: #383f4a;
+            --bot-bubble: #292a2d;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--primary-text);
+            min-height: 100vh;
+        }
+        
+        .user-input {
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--primary-text);
+            transition: all 0.3s ease;
+        }
+        
+        .user-input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(123, 97, 255, 0.2);
+        }
+        
+        .button-primary {
+            background-color: var(--accent-color);
+            transition: all 0.2s ease;
+        }
+        
+        .button-primary:hover {
+            background-color: var(--accent-light);
+        }
+        
+        .header {
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .card {
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+        
+        .feature-icon {
+            background-color: rgba(123, 97, 255, 0.1);
+            color: var(--accent-color);
+            border-radius: 12px;
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="header py-4 px-6 flex items-center justify-between">
+            <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-accent-color" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <h1 class="text-xl font-semibold ml-2">RagGit</h1>
+            </div>
+            <div>
+                <a href="/chat" class="text-secondary-text hover:text-primary-text">
+                    Already have a repo? Go to Chat
+                </a>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="flex-grow flex items-center justify-center p-6">
+            <div class="max-w-4xl w-full">
+                <!-- Hero Section -->
+                <section class="text-center mb-12">
+                    <h1 class="text-4xl font-bold mb-4">Explore Your Git Repository With AI</h1>
+                    <p class="text-xl text-secondary-text max-w-2xl mx-auto">
+                        GitRepoBot analyzes your repository and answers questions about code, commits, and project structure using natural language.
+                    </p>
+                </section>
+                
+                <!-- Repository Input Card -->
+                <section class="card p-6 mb-12">
+                    <h2 class="text-2xl font-semibold mb-4">Get Started</h2>
+                    <p class="text-secondary-text mb-6">Enter a GitHub repository URL to clone and analyze</p>
+                    
+                    <form id="repoForm" class="space-y-4">
+                        <div>
+                            <label for="repoUrl" class="block text-sm font-medium mb-2">Repository URL</label>
+                            <input 
+                                type="text" 
+                                id="repoUrl" 
+                                name="repoUrl" 
+                                placeholder="https://github.com/username/repository.git" 
+                                class="user-input px-4 py-3 w-full"
+                                required
+                            >
+                        </div>
+                        
+                        <div>
+                            <label for="targetDirectory" class="block text-sm font-medium mb-2">Local Directory (optional)</label>
+                            <input 
+                                type="text" 
+                                id="targetDirectory" 
+                                name="targetDirectory" 
+                                placeholder="C:/Users/username/repos" 
+                                class="user-input px-4 py-3 w-full"
+                            >
+                            <p class="text-xs text-secondary-text mt-1">
+                                If left empty, the default directory will be used
+                            </p>
+                        </div>
+                        
+                        <div class="pt-2">
+                            <button type="submit" class="button-primary w-full py-3 rounded-lg font-medium">
+                                Load Repository
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Status Message (hidden initially) -->
+                    <div id="statusMessage" class="mt-4 py-3 px-4 rounded-lg hidden">
+                        <p id="statusText" class="text-center"></p>
+                    </div>
+                </section>
+                
+                <div class="divider"></div>
+                
+                <!-- Features Section -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-semibold mb-6 text-center">Features</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="p-4">
+                            <div class="feature-icon p-3 inline-block mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-medium mb-2">Code Understanding</h3>
+                            <p class="text-secondary-text">
+                                Ask about specific functions, classes, or code patterns in your repository.
+                            </p>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="feature-icon p-3 inline-block mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-medium mb-2">Commit History</h3>
+                            <p class="text-secondary-text">
+                                Explore commit history, changes, and contributor information naturally.
+                            </p>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="feature-icon p-3 inline-block mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-medium mb-2">Project Analysis</h3>
+                            <p class="text-secondary-text">
+                                Get insights about project structure, dependencies, and overall architecture.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="py-4 px-6 text-center text-secondary-text">
+            <p>© 2025 RagGit. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const repoForm = document.getElementById('repoForm');
+            const statusMessage = document.getElementById('statusMessage');
+            const statusText = document.getElementById('statusText');
+            
+            repoForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const repoUrl = document.getElementById('repoUrl').value;
+                const targetDirectory = document.getElementById('targetDirectory').value || null;
+                
+                // Show loading message
+                statusMessage.classList.remove('hidden', 'bg-green-100', 'bg-red-100');
+                statusMessage.classList.add('bg-blue-100');
+                statusText.classList.remove('text-green-700', 'text-red-700');
+                statusText.classList.add('text-blue-700');
+                statusText.textContent = 'Loading repository... This may take a moment.';
+                
+                // Send the repository information to the server
+                fetch('/setup_repo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        repo_url: repoUrl,
+                        target_directory: targetDirectory
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Show success message
+                        statusMessage.classList.remove('bg-blue-100', 'bg-red-100');
+                        statusMessage.classList.add('bg-green-100');
+                        statusText.classList.remove('text-blue-700', 'text-red-700');
+                        statusText.classList.add('text-green-700');
+                        statusText.textContent = 'Repository loaded successfully! Redirecting to chat...';
+                        
+                        // Redirect to chat page after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = '/chat';
+                        }, 2000);
+                    } else {
+                        // Show error message
+                        statusMessage.classList.remove('bg-blue-100', 'bg-green-100');
+                        statusMessage.classList.add('bg-red-100');
+                        statusText.classList.remove('text-blue-700', 'text-green-700');
+                        statusText.classList.add('text-red-700');
+                        statusText.textContent = `Error: ${data.message}`;
+                    }
+                })
+                .catch(error => {
+                    // Show error message
+                    statusMessage.classList.remove('bg-blue-100', 'bg-green-100');
+                    statusMessage.classList.add('bg-red-100');
+                    statusText.classList.remove('text-blue-700', 'text-green-700');
+                    statusText.classList.add('text-red-700');
+                    statusText.textContent = `Error: ${error.message}`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

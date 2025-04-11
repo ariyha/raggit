@@ -1,0 +1,492 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RagGit</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #1a1a1a;
+            --secondary-bg: #242424;
+            --border-color: #383838;
+            --primary-text: #f3f4f6;
+            --secondary-text: #9ca3af;
+            --accent-color: #7b61ff;
+            --accent-light: #9580ff;
+            --user-bubble: #383f4a;
+            --bot-bubble: #292a2d;
+            --context-bg: #1e1e1e;
+            --context-border: #303030;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--primary-text);
+            min-height: 100vh;
+        }
+        
+        .chat-container {
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) var(--secondary-bg);
+        }
+        
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .chat-container::-webkit-scrollbar-track {
+            background: var(--secondary-bg);
+        }
+        
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 10px;
+        }
+        
+        .message-bubble {
+            border-radius: 18px;
+            max-width: 80%;
+            margin-bottom: 20px;
+            padding: 16px;
+            line-height: 1.5;
+        }
+        
+        .user-message {
+            background-color: var(--user-bubble);
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .bot-message {
+            background-color: var(--bot-bubble);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .context-panel {
+            background-color: var(--context-bg);
+            border: 1px solid var(--context-border);
+            border-radius: 8px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            margin-top: 8px;
+        }
+        
+        .context-panel.open {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .user-input {
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--primary-text);
+            transition: all 0.3s ease;
+        }
+        
+        .user-input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(123, 97, 255, 0.2);
+        }
+        
+        .button-primary {
+            background-color: var(--accent-color);
+            transition: all 0.2s ease;
+        }
+        
+        .button-primary:hover {
+            background-color: var(--accent-light);
+        }
+        
+        .context-toggle {
+            font-size: 12px;
+            color: var(--secondary-text);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        
+        .context-toggle:hover {
+            color: var(--accent-light);
+        }
+        
+        .context-toggle svg {
+            transition: transform 0.2s ease;
+        }
+        
+        .context-toggle.open svg {
+            transform: rotate(180deg);
+        }
+        
+        .notes-panel {
+            background-color: var(--secondary-bg);
+            border-left: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .note-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+        }
+        
+        .note-textarea {
+            background-color: var(--primary-bg);
+            border: 1px solid var(--border-color);
+            color: var(--primary-text);
+        }
+        
+        .note-textarea:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+        
+        .chat-header {
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .chat-footer {
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .divider {
+            height: 24px;
+            width: 1px;
+            background-color: var(--border-color);
+            margin: 0 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen flex flex-col">
+        <!-- Main Content -->
+        <main class="flex-grow flex">
+            <!-- Chat Area -->
+            <div class="flex-grow flex flex-col h-screen">
+                <!-- Chat Header -->
+                <header class="chat-header py-4 px-6 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-accent-color" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <h1 class="text-xl font-semibold ml-2">RagGit</h1>
+                    </div>
+                    <button id="toggleNotes" class="flex items-center text-secondary-text hover:text-primary-text">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Notes
+                    </button>
+                </header>
+                
+                <!-- Chat Messages -->
+                <div id="chatMessages" class="flex-grow p-6 overflow-y-auto chat-container">
+                    <div class="max-w-3xl mx-auto">
+                        <div class="bot-message message-bubble">
+                            <p>Hello! I'm RagGit. Ask me anything about your git repository.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Input Area -->
+                <div class="chat-footer p-4">
+                    <div class="max-w-3xl mx-auto">
+                        <div class="relative">
+                            <input type="text" id="userQuery" placeholder="Ask something about your repository..." 
+                                class="user-input px-4 py-3 w-full pr-12">
+                            <button id="sendQuery" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-accent-color hover:text-accent-light p-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notes Panel (Hidden by default) -->
+            <div id="notesPanel" class="notes-panel w-0 overflow-hidden transition-all">
+                <div class="p-4 h-full flex flex-col">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold">Notes</h2>
+                        <button id="closeNotes" class="text-secondary-text hover:text-primary-text">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="flex-grow overflow-y-auto mb-4">
+                        <div id="notesList" class="space-y-4">
+                            <!-- Notes will be added here -->
+                        </div>
+                    </div>
+                    <div id="currentNoteContainer" class="hidden">
+                        <h3 class="font-medium mb-2 text-secondary-text">Add Note for Current Response</h3>
+                        <textarea id="currentNote" class="note-textarea w-full h-32 p-3 rounded-lg" 
+                                placeholder="Type your notes here..."></textarea>
+                        <button id="saveNote" class="button-primary px-4 py-2 rounded-lg font-medium mt-3 w-full">
+                            Save Note
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleNotesBtn = document.getElementById('toggleNotes');
+            const closeNotesBtn = document.getElementById('closeNotes');
+            const notesPanel = document.getElementById('notesPanel');
+            const sendQueryBtn = document.getElementById('sendQuery');
+            const userQueryInput = document.getElementById('userQuery');
+            const chatMessages = document.getElementById('chatMessages');
+            const saveNoteBtn = document.getElementById('saveNote');
+            const currentNoteContainer = document.getElementById('currentNoteContainer');
+            
+            let currentQuery = '';
+            let currentResponse = '';
+            let notesOpen = false;
+            
+            // Toggle notes panel
+            toggleNotesBtn.addEventListener('click', function() {
+                openNotesPanel();
+            });
+            
+            closeNotesBtn.addEventListener('click', function() {
+                closeNotesPanel();
+            });
+            
+            function openNotesPanel() {
+                notesOpen = true;
+                notesPanel.classList.remove('w-0');
+                notesPanel.classList.add('w-96');
+            }
+            
+            function closeNotesPanel() {
+                notesOpen = false;
+                notesPanel.classList.remove('w-96');
+                notesPanel.classList.add('w-0');
+            }
+            
+            // Send query
+            sendQueryBtn.addEventListener('click', sendQuery);
+            userQueryInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendQuery();
+                }
+            });
+            
+            function sendQuery() {
+                const query = userQueryInput.value;
+                if (!query) return;
+                
+                currentQuery = query;
+                addMessage(query, 'user');
+                userQueryInput.value = '';
+                
+                // Show typing indicator
+                const typingIndicator = createTypingIndicator();
+                chatMessages.querySelector('.max-w-3xl').appendChild(typingIndicator);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                fetch('/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove typing indicator
+                    typingIndicator.remove();
+                    
+                    if (data.status === 'success') {
+                        currentResponse = data.response;
+                        // Pass context to the addMessage function
+                        addMessage(data.response, 'bot', data.context);
+                        currentNoteContainer.classList.remove('hidden');
+                    } else {
+                        addMessage(`Error: ${data.message}`, 'bot');
+                    }
+                })
+                .catch(error => {
+                    // Remove typing indicator
+                    typingIndicator.remove();
+                    addMessage(`Error: ${error.message}`, 'bot');
+                });
+            }
+            
+            // Create typing indicator
+            function createTypingIndicator() {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message-bubble', 'bot-message', 'typing-indicator');
+                
+                const dotContainer = document.createElement('div');
+                dotContainer.classList.add('flex', 'space-x-2');
+                
+                for (let i = 0; i < 3; i++) {
+                    const dot = document.createElement('div');
+                    dot.classList.add('w-2', 'h-2', 'bg-secondary-text', 'rounded-full');
+                    dot.style.animation = `bounce 1.4s infinite ease-in-out both`;
+                    dot.style.animationDelay = `${i * 0.16}s`;
+                    dotContainer.appendChild(dot);
+                }
+                
+                messageDiv.appendChild(dotContainer);
+                
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes bounce {
+                        0%, 80%, 100% { transform: scale(0); }
+                        40% { transform: scale(1.0); }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                return messageDiv;
+            }
+            
+            // Save note
+            saveNoteBtn.addEventListener('click', function() {
+                const note = document.getElementById('currentNote').value;
+                if (!note) return;
+                
+                fetch('/save_note', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: currentQuery,
+                        response: currentResponse,
+                        note: note
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        addNote(currentQuery, note);
+                        document.getElementById('currentNote').value = '';
+                    }
+                });
+            });
+            
+            // Add message to chat
+            function addMessage(message, sender, context = null) {
+                const messagesContainer = chatMessages.querySelector('.max-w-3xl');
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message-bubble', `${sender}-message`);
+                
+                const messagePara = document.createElement('p');
+                messagePara.textContent = message;
+                messageDiv.appendChild(messagePara);
+                
+                // Add context toggle and panel for bot messages
+                if (sender === 'bot' && context) {
+                    // Create context toggle button
+                    const contextToggle = document.createElement('div');
+                    contextToggle.classList.add('context-toggle');
+                    contextToggle.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                        <span>Show Context</span>
+                    `;
+                    messageDiv.appendChild(contextToggle);
+                    
+                    // Create context panel
+                    const contextPanel = document.createElement('div');
+                    contextPanel.classList.add('context-panel');
+                    
+                    const contextContent = document.createElement('pre');
+                    contextContent.classList.add('text-xs', 'p-3', 'overflow-x-auto');
+                    
+                    // Format the context data nicely
+                    let formattedContext;
+                    if (typeof context === 'string') {
+                        formattedContext = context;
+                    } else {
+                        try {
+                            formattedContext = JSON.stringify(context, null, 2);
+                        } catch (e) {
+                            formattedContext = 'Context data could not be displayed';
+                        }
+                    }
+                    
+                    contextContent.textContent = formattedContext;
+                    contextPanel.appendChild(contextContent);
+                    messageDiv.appendChild(contextPanel);
+                    
+                    // Add toggle functionality
+                    contextToggle.addEventListener('click', function() {
+                        contextPanel.classList.toggle('open');
+                        contextToggle.classList.toggle('open');
+                        
+                        // Change text based on state
+                        const toggleText = contextToggle.querySelector('span');
+                        if (contextPanel.classList.contains('open')) {
+                            toggleText.textContent = 'Hide Context';
+                        } else {
+                            toggleText.textContent = 'Show Context';
+                        }
+                    });
+                }
+                
+                messagesContainer.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Add note to notes panel
+            function addNote(query, note) {
+                const noteDiv = document.createElement('div');
+                noteDiv.classList.add('note-card', 'p-3', 'rounded-lg', 'mb-3');
+                
+                const queryPara = document.createElement('p');
+                queryPara.classList.add('font-medium', 'text-sm', 'text-accent-light', 'mb-2');
+                queryPara.textContent = `Query: ${query}`;
+                
+                const notePara = document.createElement('p');
+                notePara.classList.add('text-sm');
+                notePara.textContent = note;
+                
+                const timestamp = document.createElement('p');
+                timestamp.classList.add('text-xs', 'text-secondary-text', 'mt-2');
+                const now = new Date();
+                timestamp.textContent = now.toLocaleString();
+                
+                noteDiv.appendChild(queryPara);
+                noteDiv.appendChild(notePara);
+                noteDiv.appendChild(timestamp);
+                
+                document.getElementById('notesList').appendChild(noteDiv);
+                
+                // If no notes, show a message
+                const emptyMessage = document.getElementById('emptyNotesMessage');
+                if (emptyMessage) {
+                    emptyMessage.remove();
+                }
+            }
+            
+            // Initialize empty notes message
+            if (document.getElementById('notesList').children.length === 0) {
+                const emptyMessage = document.createElement('p');
+                emptyMessage.id = 'emptyNotesMessage';
+                emptyMessage.classList.add('text-secondary-text', 'text-center', 'py-6');
+                emptyMessage.textContent = 'No notes yet. Add notes about responses to keep track of important information.';
+                document.getElementById('notesList').appendChild(emptyMessage);
+            }
+        });
+    </script>
+</body>
+</html>
