@@ -12,7 +12,6 @@ RagGit is an advanced web application that allows you to ask natural language qu
 - **🔍 Git Repository Intelligence**: Ask questions about code functionality, architecture, dependencies, and more
 - **💬 Interactive Chat Interface**: User-friendly interface to interact with your repository using natural language
 - **🧠 Context-Aware Responses**: The bot provides reasoning context alongside answers
-- **📝 Note-Taking**: Save important information from conversations for future reference
 - **📂 Local Repository Management**: Clone and manage repositories directly from the UI
 - **🧩 Comprehensive File Analysis**: Analyzes various file types and understands code patterns across multiple languages
 
