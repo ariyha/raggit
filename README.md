@@ -1,7 +1,7 @@
 # RagGit: Your Git Repository Intelligence Chatbot 🤖💬
 
 <div align="center">
-  <img src="https://via.placeholder.com/800x400?text=RagGit+Repository+Intelligence" alt="RagGit Banner" width="800"/>
+
   <p><em>Ask questions about your code in natural language and get intelligent answers</em></p>
 </div>
 
@@ -16,9 +16,6 @@ RagGit is an advanced web application that allows you to ask natural language qu
 - **📂 Local Repository Management**: Clone and manage repositories directly from the UI
 - **🧩 Comprehensive File Analysis**: Analyzes various file types and understands code patterns across multiple languages
 
-<div align="center">
-  <img src="https://via.placeholder.com/600x300?text=RagGit+Chat+Interface" alt="RagGit Interface Screenshot" width="600"/>
-</div>
 
 ## 🏗️ Project Structure
 
@@ -54,10 +51,6 @@ ragggit/
 - **👥 Agent Framework**: CrewAI for multi-agent collaboration
 - **🔄 Repository Management**: GitPython for Git operations
 
-<div align="center">
-  <img src="https://via.placeholder.com/600x300?text=RagGit+Architecture" alt="RagGit Architecture Diagram" width="600"/>
-</div>
-
 ## 🚀 Setup Instructions
 
 ### Prerequisites
@@ -70,7 +63,7 @@ ragggit/
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/ragggit.git
+   git clone https://github.com/ariyha/raggit.git
    cd ragggit
    ```
 
@@ -107,9 +100,6 @@ ragggit/
    http://localhost:5000
    ```
 
-<div align="center">
-  <img src="https://via.placeholder.com/600x300?text=RagGit+Landing+Page" alt="RagGit Landing Page Screenshot" width="600"/>
-</div>
 
 ## 📖 Usage Guide
 
@@ -133,13 +123,6 @@ ragggit/
    - Each response has a "Show Context" toggle to see the information sources used
    - This helps understand how the answer was derived
 
-5. **📝 Taking Notes**:
-   - Click the "Notes" button in the top-right corner to open the notes panel
-   - Add notes to important responses for future reference
-
-<div align="center">
-  <img src="https://via.placeholder.com/600x400?text=RagGit+Demo+GIF" alt="RagGit Demo" width="600"/>
-</div>
 
 ## 🔧 Environment Variables
 
@@ -155,7 +138,8 @@ Major dependencies include:
 - 🔮 google-generativeai >= 0.3.0
 - 🗝️ python-dotenv >= 1.0.0
 - 🌐 Flask (for web server)
-- 📊 GitPython (for Git operations)
+- 📊 tqdm
+- 🛜 GitPython (for Git operations)
 
 ## 👥 Contributing
 
